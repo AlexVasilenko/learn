@@ -29,17 +29,10 @@
                   };
               }
               componentDidUpdate() {
-                console.log('update');
-                //this.setState({
-                  //  classNames: 'animated flash',
-                //});
 
-                debugger;
-                this.wrapperElement.classList.remove('animated');
                 this.wrapperElement.classList.remove('flash');
                 setTimeout(() => {
-                  this.wrapperElement.classList.add('animated');
-                this.wrapperElement.classList.add('flash');
+                  this.wrapperElement.classList.add('flash');
                 }, 0);
               }
 
