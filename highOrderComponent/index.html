@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Create high order component</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script src="https://unpkg.com/react@15/dist/react.js"></script>
+    <script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script type="text/babel">
+        class Text extends React.Component {
+            render() {
+              return <h1>some text {this.props.name}</h1>;
+            }
+        }
+
+        let wrapper = function(Component) {
+          return class extends React.Component {
+              constructor () {
+                  super();
+                  this.state = {
+                      opacity: 1,
+                      classNames: 'animated flash',
+                  };
+              }
+              componentDidUpdate() {
+                console.log('update');
+                //this.setState({
+                  //  classNames: 'animated flash',
+                //});
+
+                debugger;
+                this.wrapperElement.classList.remove('animated');
+                this.wrapperElement.classList.remove('flash');
+                setTimeout(() => {
+                  this.wrapperElement.classList.add('animated');
+                this.wrapperElement.classList.add('flash');
+                }, 0);
+              }
+
+              renderElement() {
+                  let classNames = `animated flash`;
+                  return (<div className={classNames} ref={(wrapper) => { this.wrapperElement = wrapper; }}>
+                    <Component {...this.props} />
+                    </div>); 
+              }
+
+              render() {
+                return this.renderElement();  
+              }
+          }
+        }
+
+        let Wrapped = wrapper(Text);
+
+        class Container extends React.Component {
+            constructor() {
+                super();
+                this.state = {
+                    name: 'alex',
+                };
+            }
+            componentDidMount() {
+                setInterval(() => {
+              this.setState({
+                  name: Math.random(),
+              });
+            }, 2000);
+            }
+            render() {
+              return <Wrapped name={this.state.name} />;
+            }
+        }
+
+        ReactDOM.render(
+            <Container />,
+            document.getElementById('app')
+            );
+    </script>
+  </body>
+</html>
