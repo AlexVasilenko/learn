@@ -20,36 +20,59 @@
         }
 
         let wrapper = function(Component) {
-          return class extends React.Component {
-              constructor () {
-                  super();
-                  this.state = {
-                      opacity: 1,
-                      classNames: 'animated flash',
-                  };
-              }
-              componentDidUpdate() {
 
-                this.wrapperElement.classList.remove('flash');
+            function setAnimationClass(element, animationClass) {
+                element.classList.remove(animationClass);
                 setTimeout(() => {
-                  this.wrapperElement.classList.add('flash');
+                  element.classList.add(animationClass);
                 }, 0);
-              }
+            }
 
-              renderElement() {
-                  let classNames = `animated flash`;
-                  return (<div className={classNames} ref={(wrapper) => { this.wrapperElement = wrapper; }}>
-                    <Component {...this.props} />
-                    </div>); 
+            function callComponentDidUpdate(fn) {
+              if (fn) {
+                    fn();
+                }
+            }
+
+            if (!Component.render && !Component.prototype.render) {
+
+                return class extends React.Component {
+
+              componentDidUpdate() {
+                setAnimationClass(this.wrapperElement, 'flash');
+                let superFn = super.componentDidUpdate;
+                callComponentDidUpdate(superFn);
+              }
+                    render() {
+                       return (<div className="animated flash" ref={(wrapper) => { this.wrapperElement = wrapper; }}>
+                    {Component(this.props, this.context)}
+                </div>);
+                    }
+                }
+            }
+            
+          return class extends Component {
+              componentDidUpdate() {
+                setAnimationClass(this.wrapperElement, 'flash');
+                let superFn = super.componentDidUpdate;
+                callComponentDidUpdate(superFn);
               }
 
               render() {
-                return this.renderElement();  
+                return (<div className="animated flash" ref={(wrapper) => { this.wrapperElement = wrapper; }}>
+                    {super.render()}
+                </div>);
               }
           }
         }
 
-        let Wrapped = wrapper(Text);
+        let pureComponent = ({name}) => {
+            return <h1>some text {name}</h1>;
+        }
+
+        let Wrapped = wrapper(pureComponent);
+
+        //let Wrapped = wrapper(Text);
 
         class Container extends React.Component {
             constructor() {
